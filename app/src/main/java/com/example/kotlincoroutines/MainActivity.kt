@@ -3,10 +3,7 @@ package com.example.kotlincoroutines
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,20 +13,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Log.d(TAG, "Before runBlocking")
-        runBlocking {
-            launch(Dispatchers.IO) {
-                delay(3000L)
-                Log.d(TAG, "Finished IO Coroutine 1")
+        val job = GlobalScope.launch(Dispatchers.Default) {
+            Log.d(TAG, "Starting long running calculation...")
+            withTimeout(3000L) {
+                for (i in 30..40) {
+                    if (isActive) {
+                        Log.d(TAG, "Result for i = $i: ${fib(i)}")
+                    }
+                }
             }
-            launch(Dispatchers.IO) {
-                delay(3000L)
-                Log.d(TAG, "Finished IO Coroutine 2")
-            }
-            Log.d(TAG, "Start of runBlocking")
-            delay(5000L)
-            Log.d(TAG, "End of runBlocking")
+            Log.d(TAG, "Ending long running calculation...")
         }
-        Log.d(TAG, "After runBlocking")
+    }
+
+    fun fib(n: Int): Long {
+        return when (n) {
+            0 -> 0
+            1 -> 1
+            else -> fib(n - 1) + fib(n - 2)
+        }
     }
 }
