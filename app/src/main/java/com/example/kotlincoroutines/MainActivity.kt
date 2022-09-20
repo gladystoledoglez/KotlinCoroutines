@@ -16,9 +16,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         GlobalScope.launch {
-            delay(3000L)
-            Log.d(TAG, "Coroutine from thread ${Thread.currentThread().name}")
+            val networkCallAnswer1 = doNetworkCall1()
+            val networkCallAnswer2 = doNetworkCall2()
+            Log.d(TAG, networkCallAnswer1)
+            Log.d(TAG, networkCallAnswer2)
         }
-        Log.d(TAG, "From Thread ${Thread.currentThread().name}")
+    }
+    suspend fun doNetworkCall1(): String{
+        delay(3000L)
+        return "This is the answer"
+    }
+
+    suspend fun doNetworkCall2(): String{
+        delay(3000L)
+        return "This is the answer"
     }
 }
