@@ -1,37 +1,39 @@
 package com.example.kotlincoroutines
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.*
-import kotlin.system.measureTimeMillis
+import androidx.lifecycle.lifecycleScope
+import com.example.kotlincoroutines.databinding.ActivityMainBinding
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private val TAG = "Main Activity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        GlobalScope.launch(Dispatchers.Default) {
-            val time = measureTimeMillis {
-                val answer1 = async { networkCall1() }
-                val answer2 = async { networkCall2() }
-                Log.d(TAG, "Answer1 is ${answer1.await()}")
-                Log.d(TAG, "Answer2 is ${answer2.await()}")
+        binding.btnStartActivity.setOnClickListener {
+            lifecycleScope.launch {
+                while (true) {
+                    delay(1000L)
+                    Log.d(TAG, "Still running...")
+                }
             }
-            Log.d(TAG, "Request took $time ms.")
+            GlobalScope.launch {
+                delay(5000L)
+                Intent(this@MainActivity, SecondActivity::class.java).also {
+                    startActivity(it)
+                    finish()
+                }
+            }
         }
-    }
-
-    suspend fun networkCall1(): String {
-        delay(3000L)
-        return "Answer 1"
-    }
-
-    suspend fun networkCall2(): String {
-        delay(3000L)
-        return "Answer 2"
     }
 }
